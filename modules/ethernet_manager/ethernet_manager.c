@@ -110,7 +110,22 @@ int ethernet_init(ethernet_config_t* config) {
            check_info.ip[0], check_info.ip[1], check_info.ip[2], check_info.ip[3]);
     printf("[INFO] Gateway: %d.%d.%d.%d\n", 
            check_info.gw[0], check_info.gw[1], check_info.gw[2], check_info.gw[3]);
+
+
+    printf("[INFO] Aguardando link físico...\n");
+    int retries = 5; // Tenta por 2.5 segundos
+    while (retries > 0 && wizphy_getphylink() != PHY_LINK_ON) {
+        sleep_ms(500);
+        retries--;
+    }
+
+    if (wizphy_getphylink() != PHY_LINK_ON) {
+        printf("[ERRO] Link Ethernet não detectado após a inicialização. Verifique o cabo.\n");
+        current_status = ETHERNET_DISCONNECTED;
+        return -1; // Sinaliza a falha
+    }
     
+    printf("[OK] Link físico detectado.\n");
     current_status = ETHERNET_CONNECTED;
     return 0;
 }
