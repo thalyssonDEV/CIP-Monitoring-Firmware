@@ -2,6 +2,14 @@
 #define SENSOR_MANAGER_H
 
 /**
+ * @brief Valor sentinela para indicar falha na leitura do sensor.
+ *
+ * Utilizado para garantir que erros de leitura sejam inequivocamente
+ * distinguíveis de leituras válidas (que, por definição, não são negativas).
+ */
+#define SENSOR_READ_ERROR -1.0f
+
+/**
  * @brief Estrutura para dados consolidados dos sensores
  */
 typedef struct {

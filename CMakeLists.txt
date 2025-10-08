@@ -88,48 +88,60 @@ target_compile_definitions(iolibrary_static PRIVATE
 
 # Carrega todas as variáveis do secrets.cmake para o build.
 if(NOT EXISTS ${CMAKE_SOURCE_DIR}/secrets.cmake)
-    message(FATAL_ERROR "Arquivo 'secrets.cmake' nao encontrado! Por favor, crie um a partir do 'secrets.cmake.example'.")
+    message(FATAL_ERROR "Arquivo 'secrets.cmake' nao encontrado!")
 endif()
 include(secrets.cmake)
 
-# Add executable. Default name is the project name, version 0.1
+# Carrega todas as variáveis do config.cmake para o build.
+if(NOT EXISTS ${CMAKE_SOURCE_DIR}/config.cmake)
+    message(FATAL_ERROR "Arquivo 'config.cmake' nao encontrado!")
+endif()
+include(config.cmake)
 
+# Add executable. Default name is the project name, version 0.1
 add_executable(main src/main.c
-modules/temperature/temperature.c
-modules/concentration/concentration.c
-modules/flow/flow.c
 modules/ethernet_manager/ethernet_manager.c
 modules/ethernet_manager/w5500_config
 modules/http_client/http_client.c
 modules/sensor_manager/sensor_manager.c
-modules/adc_manager/adc_manager.c)
+modules/adc_manager/adc_manager.c
+modules/analog_sensor/analog_sensor.c)
 
 # Macros de pré-processador (-D) durante a compilação.
 target_compile_definitions(main PRIVATE
     TARGET_SERVER_IP="${TARGET_SERVER_IP}"
     TARGET_PORT=${TARGET_PORT}
     TARGET_PATH="${TARGET_PATH}"
-    ETHERNET_MAC_0=0x00
-    ETHERNET_MAC_1=0x08
-    ETHERNET_MAC_2=0xDC
-    ETHERNET_MAC_3=0x11
-    ETHERNET_MAC_4=0x22
-    ETHERNET_MAC_5=0x33
-    DEVICE_IP_0=192
-    DEVICE_IP_1=168
-    DEVICE_IP_2=15
-    DEVICE_IP_3=2
-    GATEWAY_IP_0=192
-    GATEWAY_IP_1=168
-    GATEWAY_IP_2=15
-    GATEWAY_IP_3=1
-    SUBNET_MASK_0=255
-    SUBNET_MASK_1=255
-    SUBNET_MASK_2=255
-    SUBNET_MASK_3=0
-
-    # NÃO MEXER NAS VARIÁVEIS ACIMA, SENÃO NAO FUNCIONA.
+    HTTP_TIMEOUT_MS=${HTTP_TIMEOUT_MS}
+    SENSOR_CONCENTRATION_MAX_VOLTAGE=${SENSOR_CONCENTRATION_MAX_VOLTAGE}
+    SENSOR_CONCENTRATION_MAX_VALUE=${SENSOR_CONCENTRATION_MAX_VALUE}
+    SENSOR_CONCENTRATION_MIN_VALUE=${SENSOR_CONCENTRATION_MIN_VALUE}
+    SENSOR_TEMPERATURE_MAX_VOLTAGE=${SENSOR_TEMPERATURE_MAX_VOLTAGE}
+    SENSOR_TEMPERATURE_MAX_VALUE=${SENSOR_TEMPERATURE_MAX_VALUE}
+    SENSOR_TEMPERATURE_MIN_VALUE=${SENSOR_TEMPERATURE_MIN_VALUE}
+    SENSOR_FLOW_MAX_VOLTAGE=${SENSOR_FLOW_MAX_VOLTAGE}
+    SENSOR_FLOW_MAX_VALUE=${SENSOR_FLOW_MAX_VALUE}
+    SENSOR_FLOW_MIN_VALUE=${SENSOR_FLOW_MIN_VALUE}
+    CYCLE_INTERVAL_MS=${MAIN_TASK_CYCLE_INTERVAL_MS}
+    WATCHDOG_TIMEOUT_MS=${SYSTEM_WATCHDOG_TIMEOUT_MS}
 )
+
+# Itera sobre as listas de rede para criar as definições C necessárias
+foreach(INDEX RANGE 5)
+    list(GET ETHERNET_MAC ${INDEX} VALUE)
+    target_compile_definitions(main PRIVATE "ETHERNET_MAC_${INDEX}=${VALUE}")
+endforeach()
+
+foreach(INDEX RANGE 3)
+    list(GET DEVICE_IP ${INDEX} IP_VAL)
+    list(GET GATEWAY_IP ${INDEX} GW_VAL)
+    list(GET SUBNET_MASK ${INDEX} SN_VAL)
+    target_compile_definitions(main PRIVATE 
+        "DEVICE_IP_${INDEX}=${IP_VAL}"
+        "GATEWAY_IP_${INDEX}=${GW_VAL}"
+        "SUBNET_MASK_${INDEX}=${SN_VAL}"
+    )
+endforeach()
 
 pico_set_program_name(main "main")
 pico_set_program_version(main "0.1")
