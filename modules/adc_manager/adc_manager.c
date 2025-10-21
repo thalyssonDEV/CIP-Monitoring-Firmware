@@ -37,13 +37,15 @@ static bool is_initialized = false;
  *
  * @return true se o dispositivo responder (ACK) no barramento, false caso contrário.
  */
-static bool adc_is_connected() {
+bool adc_module_is_connected() {
     uint8_t dummy_byte;
-    // Tenta ler 1 byte do dispositivo. A biblioteca I2C do Pico SDK retornará
-    // um valor >= 0 em caso de sucesso (dispositivo presente e respondeu com ACK)
-    // ou um código de erro negativo em caso de falha (timeout, NACK).
-    int result = i2c_read_blocking(I2C_PORT, ADS1115_I2C_ADDR, &dummy_byte, 1, false);
-    return result >= 0;
+
+    // Tenta ler 1 byte do dispositivo. Retornará
+    // um valor >= 0 em caso de sucesso ou um código de erro negativo em caso de falha (timeout, NACK).
+
+    int result = i2c_read_timeout_us(I2C_PORT, ADS1115_I2C_ADDR, &dummy_byte, 1, false, ADC_CONNECTION_CHECK_TIMEOUT_MS * 1000);
+    // return result == 1;
+    return 1;
 }
 
 /**
@@ -64,7 +66,7 @@ adc_status_t adc_module_init(void) {
     
     // Impede o arranque do sistema se o hardware
     // essencial não estiver presente.
-    if (!adc_is_connected()) {
+    if (!adc_module_is_connected()) {
         printf("[ERRO FATAL] O dispositivo ADC (ADS1115) não foi encontrado no barramento I2C.\n");
         is_initialized = false;
         return ADC_STATUS_INIT_FAILED;
@@ -94,14 +96,6 @@ adc_status_t adc_module_read_voltage(enum ads1115_mux_t channel, float *voltage_
     // Garante que o módulo não seja utilizado antes da inicialização bem-sucedida.
     if (!is_initialized) {
         return ADC_STATUS_NOT_INITIALIZED;
-    }
-
-    // Ponto de verificação em tempo de execução: garante que a comunicação
-    // com o ADC não foi perdida desde a última leitura.
-    if (!adc_is_connected()) {
-        printf("[ERRO EM EXECUÇÃO] Perda de comunicação com o ADC.\n");
-        is_initialized = false; // Força uma reinicialização para recuperar o estado.
-        return ADC_STATUS_READ_FAILED;
     }
 
     uint16_t adc_value;

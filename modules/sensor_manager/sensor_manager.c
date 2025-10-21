@@ -16,6 +16,24 @@ static float convert_linear_interpolation(float v, float max_v, float max_value,
     return min_value + (v * (value_range / max_v));
 }
 
+// Futura função que servirá apenas pro condutivitro, será sobre a mudança para o 
+// minimo ser 3.3 v e o máximo ser 0, inversão de valores, a formula de interpolação será
+// alterada
+static float convert_inverted_linear_interpolation_clamped(float v, float max_v, float max_value, float min_value) {
+    if (v < 0.0f) {
+        return SENSOR_READ_ERROR;
+    }
+    if (v > max_v) {
+        v = max_v;
+    }
+    if (max_v == 0.0f) {
+        return max_value;
+    }
+
+    float value_range = max_value - min_value;
+    return max_value - (v * (value_range / max_v));
+}
+
 static const analog_sensor_t temperature_sensor = {
     .adc_channel = ADS1115_MUX_SINGLE_0,
     .param1      = SENSOR_TEMPERATURE_MAX_VOLTAGE, 
@@ -24,12 +42,13 @@ static const analog_sensor_t temperature_sensor = {
     .convert     = convert_linear_interpolation
 };
 
+
 static const analog_sensor_t concentration_sensor = {
     .adc_channel = ADS1115_MUX_SINGLE_1,
     .param1      = SENSOR_CONCENTRATION_MAX_VOLTAGE, 
     .param2      = SENSOR_CONCENTRATION_MAX_VALUE,  
     .param3      = SENSOR_CONCENTRATION_MIN_VALUE,   
-    .convert     = convert_linear_interpolation
+    .convert     = convert_inverted_linear_interpolation_clamped
 };
 
 static const analog_sensor_t flow_sensor = {
@@ -78,21 +97,24 @@ int sensors_read_all(sensors_reading_t* reading) {
         return 1;
     }
 
-    float temp_v, conc_v, flow_v;
+    // Verificação da conexão com o módulo ADC ADS1115.
+    // if (!adc_module_is_connected()) {
+    //     printf("[ERRO EM EXECUÇÃO] Perda de comunicação com o ADC.\n");
+    //     reading->temperature_c = SENSOR_READ_ERROR;
+    //     reading->concentration_percent = SENSOR_READ_ERROR;
+    //     reading->flow_liter = SENSOR_READ_ERROR;
+    //     return 1;
+    // }
 
-    analog_sensor_read(&temperature_sensor, &temp_v, &reading->temperature_c);
-    analog_sensor_read(&concentration_sensor, &conc_v, &reading->concentration_percent);
-    analog_sensor_read(&flow_sensor, &flow_v, &reading->flow_liter);
+    // float temp_v, conc_v, flow_v;
+
+    // analog_sensor_read(&temperature_sensor, &temp_v, &reading->temperature_c);
+    // analog_sensor_read(&concentration_sensor, &conc_v, &reading->concentration_percent);
+    // analog_sensor_read(&flow_sensor, &flow_v, &reading->flow_liter);
 
     // O printf agora tem toda a informação de que precisa.
     printf("[DADOS] Temp: %.2f C (%.5f V) | Conc: %.2f %% (%.5f V) | Vazao: %.2f L/min (%.5f V)\n", 
-           reading->temperature_c, 
-           temp_v,
-           reading->concentration_percent,
-           conc_v,
-           reading->flow_liter,
-           flow_v
+           1,1,1,1,1,1
     );
-
     return 0;
 }

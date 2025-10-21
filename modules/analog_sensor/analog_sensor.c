@@ -24,8 +24,7 @@ int analog_sensor_read(const analog_sensor_t* sensor, float* voltage_out, float*
 
     // Valida o resultado da operação de hardware.
     if (status != ADC_STATUS_OK) {
-        // Se a leitura da tensão falhar, propaga o erro imediatamente,
-        // sem tentar a conversão.
+        // Se a leitura da tensão falhar propaga o erro sem tentar a conversão.
         *voltage_out = SENSOR_READ_ERROR;
         *final_value_out = SENSOR_READ_ERROR;
 

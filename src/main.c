@@ -3,7 +3,7 @@
 #include "pico/stdlib.h"
 #include "FreeRTOS.h"
 #include "task.h"
-
+#include "hardware/gpio.h"
 #include "hardware/watchdog.h"
 #include "modules/ethernet_manager/ethernet_manager.h"
 #include "modules/http_client/http_client.h"
@@ -69,10 +69,14 @@ void main_task(__unused void *params) {
 
 int main() {
     stdio_init_all();
-    sleep_ms(2000);
+    sleep_ms(5000);
+
+    const uint LED_PIN = 25;
+    gpio_init(LED_PIN);
+    gpio_set_dir(LED_PIN, GPIO_OUT);
+    gpio_put(LED_PIN, 1);
 
     watchdog_enable(WATCHDOG_TIMEOUT_MS, 1);
-    printf("[INFO] Watchdog habilitado com timeout de 5000ms.\n");
 
     // Cria a tarefa principal que executará a lógica do dispositivo.
     xTaskCreate(main_task, "MainTask", 2048, NULL, 1, NULL);
