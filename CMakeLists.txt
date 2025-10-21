@@ -51,6 +51,7 @@ FetchContent_Declare(
     pico-ads1115
     GIT_REPOSITORY https://github.com/antgon/pico-ads1115.git
     GIT_TAG 2541304300f7591eec2bacd9ff337505efa20331
+    SOURCE_DIR ${CMAKE_CURRENT_SOURCE_DIR}/drivers/ads_1115_driver
 )
 FetchContent_MakeAvailable(pico-ads1115)
 
@@ -124,6 +125,8 @@ target_compile_definitions(main PRIVATE
     SENSOR_FLOW_MIN_VALUE=${SENSOR_FLOW_MIN_VALUE}
     CYCLE_INTERVAL_MS=${MAIN_TASK_CYCLE_INTERVAL_MS}
     WATCHDOG_TIMEOUT_MS=${SYSTEM_WATCHDOG_TIMEOUT_MS}
+    ADC_CONNECTION_CHECK_TIMEOUT_MS=${ADC_CONNECTION_CHECK_TIMEOUT_MS}
+    "BEARER_TOKEN=\"${BEARER_TOKEN}\""
 )
 
 # Itera sobre as listas de rede para criar as definições C necessárias

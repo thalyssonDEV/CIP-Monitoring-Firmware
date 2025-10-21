@@ -104,12 +104,13 @@ http_status_t http_send_sensor_data(float temperature, float concentration, floa
     int request_len = snprintf((char*)http_request_buf, HTTP_REQUEST_BUF_SIZE,
         "POST %s HTTP/1.1\r\n"
         "Host: %s\r\n"
+        "Authorization: Bearer %s\r\n"
         "Content-Type: application/json\r\n"
         "Content-Length: %d\r\n"
         "Connection: close\r\n"
         "\r\n"
         "%s",
-        uri, TARGET_SERVER_IP, json_len, json_payload);
+        uri, TARGET_SERVER_IP, BEARER_TOKEN, json_len, json_payload);
 
     if (request_len >= HTTP_REQUEST_BUF_SIZE) {
         printf("[ERRO] Requisição HTTP muito grande\n");

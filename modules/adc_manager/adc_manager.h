@@ -22,7 +22,6 @@ typedef enum {
     ADC_STATUS_OK,                  /**< A operação foi concluída com sucesso. */
     ADC_STATUS_NOT_INITIALIZED,     /**< A operação falhou porque o módulo não foi inicializado. */
     ADC_STATUS_INIT_FAILED,         /**< A inicialização falhou, provável falha de comunicação com o hardware. */
-    ADC_STATUS_READ_FAILED,         /**< A leitura falhou, provável perda de comunicação em tempo de execução. */
     ADC_STATUS_INVALID_PARAM        /**< A operação falhou devido a um parâmetro inválido (ex: ponteiro nulo). */
 } adc_status_t;
 
@@ -36,6 +35,16 @@ typedef enum {
  * @return ADC_STATUS_OK em caso de sucesso, ou um código de erro relevante em caso de falha.
  */
 adc_status_t adc_module_init(void);
+
+/**
+ * @brief Verifica se o dispositivo ADC está presente no barramento I2C.
+ *
+ * Realiza uma comunicação de baixo nível para garantir que o dispositivo
+ * está a responder antes de tentar operações de leitura ou escrita.
+ *
+ * @return true se o dispositivo estiver conectado e a responder, false caso contrário.
+ */
+bool adc_module_is_connected(void);
 
 /**
  * @brief Lê a tensão de um canal específico do ADS1115.
