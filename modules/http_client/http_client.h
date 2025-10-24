@@ -37,10 +37,10 @@ typedef enum {
  * 6. Encerramento da conexão.
  *
  * @param temperature O valor da temperatura a ser enviado.
- * @param concentration O valor da concentração a ser enviado.
+ * @param conducitivity O valor da concentração a ser enviado.
  * @param flow O valor da vazão a ser enviado.
  * @return Um status `http_status_t` indicando o resultado da operação.
  */
-http_status_t http_send_sensor_data(float temperature, float concentration, float flow);
+http_status_t http_send_sensor_data(float temperature, float conductivity, float flow);
 
 #endif // HTTP_CLIENT_H

@@ -35,29 +35,13 @@ project(main C CXX ASM)
 # Initialise the Raspberry Pi Pico SDK
 pico_sdk_init()
 
-# Download WIZnet ioLibrary_Driver
-include(FetchContent)
-
-FetchContent_Declare(
-    iolibrary_driver
-    GIT_REPOSITORY https://github.com/Wiznet/ioLibrary_Driver.git
-    GIT_TAG master
-    SOURCE_DIR ${CMAKE_CURRENT_SOURCE_DIR}/drivers/ioLibrary_Driver
-)
-FetchContent_MakeAvailable(iolibrary_driver)
-
-# Download PICO-ADS1115 Driver
-FetchContent_Declare(
-    pico-ads1115
-    GIT_REPOSITORY https://github.com/antgon/pico-ads1115.git
-    GIT_TAG 2541304300f7591eec2bacd9ff337505efa20331
-    SOURCE_DIR ${CMAKE_CURRENT_SOURCE_DIR}/drivers/ads_1115_driver
-)
-FetchContent_MakeAvailable(pico-ads1115)
+# Defines the paths to the drivers
+set(iolibrary_driver_SOURCE_DIR ${CMAKE_CURRENT_SOURCE_DIR}/drivers/ioLibrary_Driver)
+set(pico-ads1115_SOURCE_DIR ${CMAKE_CURRENT_SOURCE_DIR}/drivers/pico-ads1115)
 
 add_subdirectory(${pico-ads1115_SOURCE_DIR}/lib pico-ads1115-lib)
 
-# Cria biblioteca estática com os arquivos necessários da ioLibrary
+# Creates static library with necessary files from ioLibrary
 add_library(iolibrary_static STATIC
     ${iolibrary_driver_SOURCE_DIR}/Ethernet/wizchip_conf.c
     ${iolibrary_driver_SOURCE_DIR}/Ethernet/socket.c
@@ -67,7 +51,7 @@ add_library(iolibrary_static STATIC
     modules/ethernet_manager/w5500_config.c
 )
 
-# Adiciona diretórios de include da ioLibrary
+# Adds ioLibrary include directories
 target_include_directories(iolibrary_static PUBLIC
     ${iolibrary_driver_SOURCE_DIR}/Ethernet
     ${iolibrary_driver_SOURCE_DIR}/Ethernet/W5500
@@ -76,7 +60,7 @@ target_include_directories(iolibrary_static PUBLIC
     ${CMAKE_CURRENT_SOURCE_DIR}/modules/ethernet_manager
 )
 
-# Linka com as bibliotecas do Pico SDK
+# Links with Pico SDK libraries
 target_link_libraries(iolibrary_static
     pico_stdlib
     hardware_spi
@@ -114,9 +98,9 @@ target_compile_definitions(main PRIVATE
     TARGET_PORT=${TARGET_PORT}
     TARGET_PATH="${TARGET_PATH}"
     HTTP_TIMEOUT_MS=${HTTP_TIMEOUT_MS}
-    SENSOR_CONCENTRATION_MAX_VOLTAGE=${SENSOR_CONCENTRATION_MAX_VOLTAGE}
-    SENSOR_CONCENTRATION_MAX_VALUE=${SENSOR_CONCENTRATION_MAX_VALUE}
-    SENSOR_CONCENTRATION_MIN_VALUE=${SENSOR_CONCENTRATION_MIN_VALUE}
+    SENSOR_CONDUCTIVITY_MAX_VOLTAGE=${SENSOR_CONDUCTIVITY_MAX_VOLTAGE}
+    SENSOR_CONDUCTIVITY_MAX_VALUE=${SENSOR_CONDUCTIVITY_MAX_VALUE}
+    SENSOR_CONDUCTIVITY_MIN_VALUE=${SENSOR_CONDUCTIVITY_MIN_VALUE}
     SENSOR_TEMPERATURE_MAX_VOLTAGE=${SENSOR_TEMPERATURE_MAX_VOLTAGE}
     SENSOR_TEMPERATURE_MAX_VALUE=${SENSOR_TEMPERATURE_MAX_VALUE}
     SENSOR_TEMPERATURE_MIN_VALUE=${SENSOR_TEMPERATURE_MIN_VALUE}
