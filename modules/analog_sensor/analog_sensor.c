@@ -10,9 +10,6 @@
 #include "../sensor_manager/sensor_manager.h"
 #include <stddef.h>
 
-/**
- * @brief Implementação da leitura e conversão de um sensor analógico.
- */
 int analog_sensor_read(const analog_sensor_t* sensor, float* voltage_out, float* final_value_out) {
     // Verificação de ponteiros Nulos
     if (sensor == NULL || sensor->convert == NULL || voltage_out == NULL || final_value_out == NULL) {

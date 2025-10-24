@@ -48,7 +48,7 @@ static int http_parse_ip_string(const char* ip_str, uint8_t* ip_bytes) {
     return 0;
 }
 
-http_status_t http_send_sensor_data(float temperature, float concentration, float flow) {
+http_status_t http_send_sensor_data(float temperature, float conductivity, float flow) {
 
     // Buffers estáticos para requisição e resposta
     static uint8_t http_request_buf[HTTP_REQUEST_BUF_SIZE];
@@ -89,8 +89,8 @@ http_status_t http_send_sensor_data(float temperature, float concentration, floa
     // 3. Preparar JSON payload
     char json_payload[256];
     int json_len = snprintf(json_payload, sizeof(json_payload),
-        "{\"temperature\":%.2f,\"concentration\":%.2f,\"flow\":%.2f}",
-        temperature, concentration, flow);
+        "{\"temperature\":%.2f,\"conductivity\":%.2f,\"flow\":%.2f}",
+        temperature, conductivity, flow);
     
     if (json_len >= sizeof(json_payload)) {
         printf("[ERRO] JSON payload muito grande\n");

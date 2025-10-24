@@ -29,18 +29,17 @@ void main_task(__unused void *params) {
 
     if (ethernet_init(&eth_config) != 0) {
         printf("[ERRO] Falha na inicialização do Ethernet. Tarefa Interrompida.\n");
-        vTaskDelete(NULL); // Encerra esta tarefa
+        vTaskDelete(NULL);
     }
 
     if (sensors_init() != 0) {
         printf("[ERRO] Falha na inicializacao dos sensores. Tarefa Interrompida.\n");
-        vTaskDelete(NULL); // Encerra esta tarefa
+        vTaskDelete(NULL); 
     }
 
     printf("[INFO] Iniciando ciclos de envio a cada %d segundos.\n", CYCLE_INTERVAL_MS / 1000);
 
     sensors_reading_t sensor_data;
-    TickType_t xLastWakeTime = xTaskGetTickCount();
 
     // 2. Loop principal
     while (1) {
@@ -52,9 +51,9 @@ void main_task(__unused void *params) {
         } else {
             // Passo 2: Enviar os dados.
             http_status_t status = http_send_sensor_data(
-                sensor_data.temperature_c,
-                sensor_data.concentration_percent,
-                sensor_data.flow_liter
+                sensor_data.temperature,
+                sensor_data.conductivity,
+                sensor_data.flow
             );
 
             if (status != HTTP_OK) {
@@ -63,7 +62,7 @@ void main_task(__unused void *params) {
         }
         
         // Passo 3: Aguardar o próximo ciclo.
-        vTaskDelayUntil(&xLastWakeTime, pdMS_TO_TICKS(CYCLE_INTERVAL_MS));
+        vTaskDelay(pdMS_TO_TICKS(CYCLE_INTERVAL_MS));
     }
 }
 
